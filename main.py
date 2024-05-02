@@ -116,8 +116,8 @@ import asyncio
 import contextlib
 import logging
 from highrise import BaseBot, AnchorPosition, Position, User, TaskGroup
-moderator = ['babyJmia', 'Alionardo_','MikeyArkham']
-co_mod = ['Alionardo_','MikeyArkham','babyJmia']
+moderator = ['Alionardo_','siyanda_mathole']
+co_mod = ['Alionardo_','siyanda_mathole']
 
 class BotDefinition:
     def __init__(self, bot, room_id, api_token):
@@ -142,14 +142,14 @@ class MyBot(BaseBot):
       super().__init__()
       self.maze_players = {}
       self.user_points = {}  # Dictionary to store user points
-      self.following_username = None
+    
       self.Emotes = Emotes
       self.should_stop = False
         
     async def on_start(self, SessionMetadata: SessionMetadata) -> None:
         try:
             
-            await self.highrise.walk_to(Position(15, 0,9, "FrontRight"))
+            await self.highrise.walk_to(Position(17, 0,2, "FrontRight"))
             await asyncio.sleep(3)
             await self.highrise.chat(" on duty!")
             item = await self.webapi.get_items(item_name="Top Knot") 
@@ -178,7 +178,7 @@ class MyBot(BaseBot):
           del self.continuous_emote_tasks[user_id]
     async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
         try:     
-            await self.highrise.send_whisper(user.id,f"Hey {user.username}\nwelcome to ️420BUNNIES VIBE/TIPS \nMake sure to follow @babyJmia , your host & your amazing dj!\nVIP is 100g to bot! \n• !list or -list or -help :To check commands, \n for bots pm @Alionardo_")
+            await self.highrise.send_whisper(user.id,f"Hey {user.username}\nwelcome to ️@siyanda_mathole party \nMake sure to follow @siyanda_mathole , your host & your amazing dj!\nVIP is 100g to bot! \n• !list or -list or -help :To check commands, \n for bots pm @Alionardo_")
         except Exception as e:
             print(f"error : {e}")
     async def teleport_user_next_to(self, target_username: str, requester_user: User):
@@ -205,7 +205,7 @@ class MyBot(BaseBot):
 
             if receiver.id  == Counter.bot_id:
               if tip.amount == 100:
-                   await self.highrise.teleport(sender.id, Position(15.5,8.5,2.5))
+                   await self.highrise.teleport(sender.id, Position(14,10.25,14.5))
     async def on_reaction(self, user: User, reaction: Reaction, receiver: User) -> None:
     
       if reaction =="wink" and user.username in moderator:
@@ -216,91 +216,8 @@ class MyBot(BaseBot):
           await self.highrise.moderate_room(receiver.id, "kick")
           await self.highrise.chat(f"{receiver.username} is Kicked by {user.username}")
       if user.username in moderator and reaction == "heart":
-          await self.highrise.teleport(receiver.id, Position(15.5,8.5,2.5))
-      if user.username in moderator and reaction == "thumbs":
-          await self.highrise.teleport(receiver.id, Position(16.5,1,1.5))
-    async def follow_user(self, target_username: str):
-      while self.following_username == target_username:
-
-          response = await self.highrise.get_room_users()
-          target_user_position = None
-          for user_info in response.content:
-              if user_info[0].username.lower() == target_username.lower():
-                  target_user_position = user_info[1]
-                  break
-
-          if target_user_position:
-              nearby_position = Position(target_user_position.x + 1.0, target_user_position.y, target_user_position.z)
-              await self.highrise.walk_to(nearby_position)
-
-              await asyncio.sleep(2)
-    async def get_emote_E(self, target) -> None: 
-
-     try:
-        emote_info = self.Emotes.get(target)
-        return emote_info
-     except ValueError:
-        pass
-    async def on_whisper(self, user: User, message: str ) -> None:
-
-        if message == "here":
-            if user.username in moderator:
-                response = await self.highrise.get_room_users()
-                users = [content for content in response.content]
-                for u in users:
-                    if u[0].id == user.id:
-                        try:
-                            await self.highrise.teleport(Counter.bot_id,Position((u[1].x),(u[1].y),(u[1].z),"FrontRight"))
-
-
-                            break
-                        except:
-
-                            pass
-       
-        if message.startswith("say"):
-             if user.username in moderator :
-                text = message.replace("say", "").strip()
-                await self.highrise.chat(text)
-
+          await self.highrise.teleport(receiver.id, Position(14,10.25,14.5))
    
-         
-
-        elif message.startswith("come"):
-           if user.username in moderator :
-                response = await self.highrise.get_room_users()
-                your_pos = None
-                for content in response.content:
-                    if content[0].id == user.id:
-                        if isinstance(content[1], Position):
-                            your_pos = content[1]
-                            break
-                if not your_pos:
-                    await self.highrise.send_whisper(user.id, "Invalid coordinates!")
-                    return
-                await self.highrise.chat(f"@{user.username} I'm coming ..")
-                await self.highrise.walk_to(your_pos)
-
-        elif message.lower().startswith("follow"):
-         
-            target_username = message.split("@")[1].strip()
-
-            if target_username.lower() == self.following_username:
-                await self.highrise.send_whisper(user.id,"I am already following.")
-            elif message.startswith("say"):
-              if user.username.lower() in self.moderators:
-                  text = message.replace("say", "").strip()
-                  await self.highrise.chat(text)
-            else:
-                self.following_username = target_username
-                await self.highrise.chat(f"hey {target_username}.")
-            
-                await self.follow_user(target_username)
-        elif message.lower() == "stop following":
-            self.following_username = None
-          
-            await self.highrise.walk_to(Position(15,0,9,"FrontLeft"))
-  
     async def on_chat(self, user: User, message: str):
         try:
             if message.lower().lstrip().startswith(("-list", "!list","-help")):
@@ -314,25 +231,18 @@ class MyBot(BaseBot):
             if message.lower().lstrip().startswith(("!loop","-loop")):
                 await self.highrise.send_whisper(user.id,"\n• loops\n ____________________________\nMention loop before the emote numer\n ____________________________")
             if message.lower().lstrip().startswith(("-teleport", "!teleport")):
-                    await self.highrise.chat(f"\n • Teleports\n ____________________________\n-g : Ground floor \n-dj : DJ setup (only mods and dj)  \n-vip or -v : (vip only), make sure you have 🎫VIP Tickets 🎫 \n• type -buy or !buy for details ")
+                    await self.highrise.chat(f"\n • Teleports\n ____________________________\n-host : (only mods ) \n-g : Ground floor \n-dj : DJ setup (only mods and dj)  \n-vip or -v : (vip only), make sure you have 🎫VIP Tickets 🎫 \n• type -buy or !buy for details ")
             if message.lower().lstrip().startswith(("!rules", "-rules")):
                    await self.highrise.chat(f"\n\n        RULES\n ____________________________\n 1. NO UNDERAGE \n 2. No advertising\n 3. No hate speech \n 4. No begging (those trash will be immediately banned 🚫) \n 5. No spamming ")
             if message.startswith("-vip")and user.username in co_mod:                              
-              await self.highrise.teleport(user.id, Position(15.5,8.5,2.5))
+              await self.highrise.teleport(user.id, Position(14,10.25,14.5))
             if message.startswith("-dj")and user.username in co_mod:                    
-              await self.highrise.teleport(user.id, Position(16.5,1,1.5)) 
+              await self.highrise.teleport(user.id, Position(16.5,9.25,3.5)) 
             if message.startswith("-g"):           
-              await self.highrise.teleport(user.id, Position(15,0, 9)) 
-        
-            if message.startswith("-all vip")and user.username in co_mod: 
-               roomUsers = (await self.highrise.get_room_users()).content
-               for roomUser, _ in roomUsers:
-                  await self.highrise.teleport( roomUser.id,Position(15.5,8.5,2.5))
-            if message.startswith("-all g")and user.username in co_mod: 
-               roomUsers = (await self.highrise.get_room_users()).content
-               for roomUser, _ in roomUsers:
-                  await self.highrise.teleport( roomUser.id,Position(15,0,9))
-            if message.lstrip().startswith(("!vip","!g","!dj")):
+              await self.highrise.teleport(user.id, Position(15,0, 5)) 
+            if message.startswith("-host")and user.username in co_mod:                              
+              await self.highrise.teleport(user.id, Position(5.5,9.5,6))
+            if message.lstrip().startswith(("!vip","!g","!dj","!host")):
                 response = await self.highrise.get_room_users()
                 users = [content[0] for content in response.content]
                 usernames = [user.username.lower() for user in users]
@@ -355,12 +265,13 @@ class MyBot(BaseBot):
                     return                     
                 try:
                     if message.startswith("!vip")and user.username in co_mod:                              
-                        await self.highrise.teleport(user_id, Position(15.5,8.5,2.5))
+                        await self.highrise.teleport(user_id, Position(14,10.25,14.5))
                     if message.startswith("!dj")and user.username in co_mod:                    
-                        await self.highrise.teleport(user_id, Position(16.5,1,1.5))
+                        await self.highrise.teleport(user_id, Position(16.5,9.25,3.5))
                     if message.startswith("!g")and user.username in co_mod:           
-                        await self.highrise.teleport(user_id, Position(15,0, 9)) 
-
+                        await self.highrise.teleport(user_id, Position(15,0, 5)) 
+                    if message.startswith("!host")and user.username in co_mod:                              
+                        await self.highrise.teleport(user_id, Position(5.5,9.5,6))
                 except Exception as e:
                     print(f"An exception occurred[Due To {parts[0][1:]}]: {e}")
 
